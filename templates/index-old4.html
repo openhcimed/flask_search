@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+    <head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+        textarea {
+            width: 100%;
+            min-height: 30rem;
+            font-family: "Lucida Console", Monaco, monospace;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            }
+    </style>
+    </head>
+    <body>
+        <div class="container">
+            
+            <h2>Query:</h2>
+            <div class="row">
+                <div class="col-sm-3">
+                    {% if query_path %}
+                    <img src="{{ query_path }}" width="200px" height="200px">
+                    {% endif %}
+                </div>
+                <div class="col-sm-9">
+                    {% if meta_data %}
+                        <span>{{ meta_data }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            
+            <!--<h2>VAE L2 Distance:</h2>
+            {% for c in candidates_vae %}
+            <figure style="float: left; margin-right: 20px; margin-bottom: 20px;">
+                <img src="data:image/jpeg;base64,{{ c[0] }}" width="100px" height="100px">
+                <figcaption>{{ c[1] }}</figcaption>
+            </figure>
+            {% endfor %}-->
+            <h2>L2 Distance:</h2>
+            <div class="row">
+                {% for c in candidates_simclr %}
+            
+                <div class="col-sm-3">
+                    <figure style="float: left; margin-right: 20px; margin-bottom: 20px;">
+                        <img src="{{ c[0] }}" width="100px" height="100px">
+                        <figcaption>{{ c[1] }}</figcaption>
+                    </figure>
+                </div>    
+                {% endfor %}
+            </div>
+        </div>
+    </body>
+</html>
+
+

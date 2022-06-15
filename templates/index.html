@@ -1,0 +1,49 @@
+
+        <div class="container">
+            
+            <h2>Query:</h2>
+            <div class="row">
+                <div class="col-sm-3">
+                    {% if query_path %}
+                    <img src="{{ query_path }}" width="150px" height="150px">
+                    {% endif %}
+                </div>
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            StartX: {{startx}}, EndX: {{endx}}, StartY: {{starty}}, EndY: {{endy}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-9">
+                            Height: {{height}}, Width: {{width}}
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            
+            <!-- <h2>VAE L2 Distance:</h2>
+            {% for c in candidates_vae %}
+            <figure style="float: left; margin-right: 20px; margin-bottom: 20px;">
+                <img src="data:image/jpeg;base64,{{ c[0] }}" width="100px" height="100px">
+                <figcaption>{{ c[1] }}</figcaption>
+            </figure>
+            {% endfor %} -->
+            
+            <h2>Search by L2 Distance:</h2>
+            <div class="row">
+                {% for c in candidates_simclr %}
+            
+                <div class="col-lg-3">
+                    <figure style="float: left; margin-right: 20px; margin-bottom: 20px;">
+                        <img src="{{ c[0] }}" width="100px" height="100px">
+                        <figcaption>"Distance: {{ c[1] }}. Coarse Type: {{ c[2] }}. Size: {{ c[3] }}. Diameter pixel: {{ c[4] }}."</figcaption>
+                    </figure>
+                </div>    
+                {% endfor %}
+            </div>
+        </div>
+
+

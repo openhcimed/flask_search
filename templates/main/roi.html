@@ -1,0 +1,206 @@
+<html>
+  <head>
+    <title>DeepHealth Annotate</title>
+    <script src="https://unpkg.com/cornerstone-core/dist/cornerstone.min.js
+"></script>
+    <script src="https://unpkg.com/cornerstone-wado-image-loader"></script>
+    <script src="https://unpkg.com/dicom-parser"></script>
+    <script src="https://unpkg.com/cornerstone-math"></script>
+    <script src="https://unpkg.com/cornerstone-tools"></script>
+    <script src="https://unpkg.com/hammerjs"></script>
+    <script type="text/javascript" 
+            src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+
+      body {
+        margin:0px;padding:0px;background:black;
+      }
+
+      #tools {
+        cursor: pointer; padding: 10px; font-size: 36px;position:absolute;top:10px;right:10px;
+      }
+
+      #searchbtn:hover {
+        background: #0b7dda;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 30rem;
+        font-family: "Lucida Console", Monaco, monospace;
+        font-size: 0.8rem;
+        line-height: 1.2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row" style='width:100%;height:100%;'>
+      <div id="result" class="col-sm-6" style="height: auto;background-color:white;">
+      </div>
+      <div class="col-sm-6">
+        <p class="p-3 text-white position-absolute">Drag and Drop Dicom file here.</p>
+        <div id='viewer' style='width:100%;height:100%;'></div>
+        <div class="btn-group" id="tools">
+          <input class="hide_file btn btn-sm btn-success text-white" type="file" multiple accept="application/dicom" id="images" title="Select your images" onchange="loadDICOMImages(event.target.files)">
+          <button type="button" onclick="enableRectangle()" class="btn btn-md btn-primary" id='rectangle_btn' data-container='body' data-toggle="tooltip" data-placement="bottom" title="Reactangle"><i class="fa fa-square"></i></button>
+
+          <button type="button" onclick="enableBrush()" class="btn btn-md btn-primary" id='brush_btn' data-container='body' data-toggle="tooltip" data-placement="bottom" title="Brush"><i class="fa fa-pencil"></i></button>
+
+<!--           <button type="button" onclick="enableStack()" class="btn btn-md btn-primary" id='stack_btn' data-container='body' data-toggle="tooltip" data-placement="bottom" title="Stack"><i class="fa fa-stack-overflow"></i></button>
+ -->
+          <button type="submit" class="btn btn-md btn-danger" id='searchbtn'><i class="fa fa-search"></i></button>
+        </div>
+      </div>  
+    </div>
+
+    <script>
+      var isReadFile = false;
+      var apiUrl = "http://localhost:44443/api/";
+      cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
+      cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
+      cornerstoneTools.external.Hammer = Hammer;
+      cornerstoneTools.external.cornerstone = cornerstone;
+      cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
+
+      function onDragOver(e) {
+
+          // stop browser processing right away
+          e.stopPropagation();
+          e.preventDefault();
+
+      };
+
+      function onDrop(e) {
+
+          // stop browser processing right away
+          e.stopPropagation();
+          e.preventDefault();
+          loadDICOMImages(e.dataTransfer.files);
+      };
+
+      function enableBrush()
+      {
+        cornerstoneTools.setToolActive('Brush', { mouseButtonMask: 1});
+      }
+
+      function enableStack()
+      {
+        cornerstoneTools.setToolActive('StackScrollMouseWheel', { mouseButtonMask: 1});
+      }
+
+      function enableRectangle()
+      {
+        cornerstoneTools.setToolActive('RectangleRoi', { mouseButtonMask: 1});
+      }
+
+      function loadDICOMImages(files) {
+        if (files && files.length > 0) {
+          imageIds = [];
+
+          for(var i=0; i<files.length; i++) {
+
+            var f = files[i];
+            imageIds.push( cornerstoneWADOImageLoader.wadouri.fileManager.add(f) );
+
+          }
+
+          cornerstone.loadImage(imageIds[0]).then(function(image) {
+
+            console.log('Loaded', image);
+
+            cornerstoneTools.init();  
+
+            var viewer = document.getElementById('viewer');
+
+            cornerstone.enable(viewer);
+            cornerstone.displayImage(viewer, image);
+            
+            // this depends on the data, i am testing with a single file
+            if (!isReadFile)
+            {
+              var stack = { currentImageIdIndex: 0, imageIds: imageIds };
+              cornerstoneTools.addStackStateManager(viewer, ["stack"]);
+              cornerstoneTools.addToolState(viewer, "stack", stack);         
+                          
+              cornerstoneTools.addTool(cornerstoneTools.StackScrollMouseWheelTool)
+              cornerstoneTools.addTool(cornerstoneTools.RectangleRoiTool);
+              cornerstoneTools.addTool(cornerstoneTools.BrushTool);
+
+              enableRectangle();
+              isReadFile = true;
+            }
+          });
+
+          document.getElementById('searchbtn').style.display = 'block';
+
+        } else { alert('Choose DICOM images to display.'); }
+      }
+
+      $(document).ready(function () {
+
+        document.body.addEventListener('dragover', onDragOver);
+        document.body.addEventListener('drop', onDrop);
+
+        document.getElementById('searchbtn').onclick = function() {
+
+            var element = cornerstone.getEnabledElements()[0]
+
+            var w = element.image.width
+            var h = element.image.height
+
+            var toolState = cornerstoneTools.globalImageIdSpecificToolStateManager.saveToolState();
+
+            var box_startx = Math.floor(toolState["dicomfile:0"].RectangleRoi.data[0].handles.start.x)
+            var box_starty = Math.floor(toolState["dicomfile:0"].RectangleRoi.data[0].handles.start.y)
+            var box_endx = Math.floor(toolState["dicomfile:0"].RectangleRoi.data[0].handles.end.x)
+            var box_endy = Math.floor(toolState["dicomfile:0"].RectangleRoi.data[0].handles.end.y)
+
+            var roi= new Uint8Array((box_endx-box_startx)*(box_endy-box_starty))
+            var p = 0;
+            for (var y = box_starty; y < box_endy; y++) {
+              for (var x = box_startx; x < box_endx; x++) {
+                roi[p] = element.renderingTools.renderCanvasData.data[(x + (y - 1) * h) * 4 + 3];
+                p++;
+              }
+            }
+
+            function tob64( buffer ) {
+                var binary = '';
+                var bytes = new Uint8Array( buffer );
+                var len = bytes.byteLength;
+                for (var i = 0; i < len; i++) {
+                    binary += String.fromCharCode( bytes[ i ] );
+                }
+                return window.btoa( binary );
+            }
+
+            var base64 = tob64(roi.buffer);
+            var dict = {
+              image: base64,
+              row: box_endx-box_startx,
+              col: box_endy-box_starty,
+              startx: box_startx,
+              starty: box_starty,
+              endx: box_endx,
+              endy: box_endy
+            };
+
+            $.ajax({
+              type: "POST",
+              url: apiUrl,
+              data: JSON.stringify(dict),
+              contentType:'application/json'
+            })
+            .done(function( msg ) {
+              $('#result').html(msg);
+            });
+        };
+      });
+    </script>
+  </body>
+</html>
