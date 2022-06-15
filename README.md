@@ -33,7 +33,7 @@ and then install the pip packages
 pip install -r requirements.txt
 ```
 
-To run:
+## To run:
 
 ```
 cd ../
