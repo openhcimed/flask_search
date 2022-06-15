@@ -1,0 +1,10 @@
+pandas
+pillow
+numpy
+pytorch-lightning-bolts
+scikit-learn
+scipy 
+matplotlib
+flask
+flask-cors
+scikit-image
