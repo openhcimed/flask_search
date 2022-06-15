@@ -33,22 +33,22 @@ def get_diameter(diameter):
 
 # Read candidates and metadata
 SKIP = [660, 6679, 6680, 9943, 11078, 11338, 18692, 19957, 22403]   # Skip non-accessible images
-dl_info = pd.read_csv('data/DL_info.csv') # Metadata of lesions
+dl_info = pd.read_csv('../../data/DL_info.csv') # Metadata of lesions
 dl_info = dl_info[~dl_info.index.isin(SKIP)]
 dl_info = dl_info[dl_info.Train_Val_Test == 3].reset_index(drop=True)
 dl_info['label'] = dl_info.Coarse_lesion_type - 1
 dl_info['lesion_size'] = dl_info.Bounding_boxes.apply(get_lesion_size)
 dl_info['diameter'] = dl_info.Lesion_diameters_Pixel_.apply(get_diameter)
 
-raw_image = np.load('weights/test_df.npy')#[:, :, :, 0]  # Candidates, i.e. DeepLesion test
+raw_image = np.load('./weights/test_df.npy')#[:, :, :, 0]  # Candidates, i.e. DeepLesion test
 raw_image = raw_image.reshape(4927, 64, 64)
 # images
-emb_image = np.load('weights/emb_image.npy')  # Pre-computed embeddings of candidates
-label = np.load('weights/label.npy')          # Label
+emb_image = np.load('./weights/emb_image.npy')  # Pre-computed embeddings of candidates
+label = np.load('./weights/label.npy')          # Label
 
 # Load model weights
 # vae = LesionVAE.load_from_checkpoint('./weights/vae.ckpt')
-simclr = LesionSimCLR.load_from_checkpoint('weights/simclr.ckpt', gpus=1, num_samples=1, batch_size=1, dataset='lesion')
+simclr = LesionSimCLR.load_from_checkpoint('./weights/simclr.ckpt', gpus=1, num_samples=1, batch_size=1, dataset='lesion')
 # vae.eval()
 simclr.eval()
 
@@ -156,7 +156,7 @@ def roi():
 
 
 if __name__=="__main__":
-    app.run("0.0.0.0", port=44443, debug=True)
+    app.run("localhost", port=44443, debug=True)
 
 
 # def get_annotation(annotations):
