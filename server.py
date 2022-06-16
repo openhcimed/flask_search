@@ -156,7 +156,7 @@ def roi():
 
 
 if __name__=="__main__":
-    app.run("localhost", port=44443, debug=True)
+    app.run("localhost", port=4444, debug=True)
 
 
 # def get_annotation(annotations):
