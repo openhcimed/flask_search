@@ -13,7 +13,7 @@ unzip weights.zip
 ## conda env
 we need miniconda (https://docs.conda.io/en/latest/miniconda.html)
 
-install and re-login
+install and re-login (python 3.7)
 
 then create the env from .yml file
 
