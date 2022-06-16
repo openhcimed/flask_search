@@ -1,5 +1,4 @@
 import sys
-sys.path.append('../..')
 import io
 import json
 import base64
@@ -33,7 +32,7 @@ def get_diameter(diameter):
 
 # Read candidates and metadata
 SKIP = [660, 6679, 6680, 9943, 11078, 11338, 18692, 19957, 22403]   # Skip non-accessible images
-dl_info = pd.read_csv('../../data/DL_info.csv') # Metadata of lesions
+dl_info = pd.read_csv('../data/DL_info.csv') # Metadata of lesions
 dl_info = dl_info[~dl_info.index.isin(SKIP)]
 dl_info = dl_info[dl_info.Train_Val_Test == 3].reset_index(drop=True)
 dl_info['label'] = dl_info.Coarse_lesion_type - 1
@@ -156,7 +155,7 @@ def roi():
 
 
 if __name__=="__main__":
-    app.run("localhost", port=4444, debug=True)
+    app.run("localhost", port=44443, debug=True)
 
 
 # def get_annotation(annotations):
