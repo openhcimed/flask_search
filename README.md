@@ -39,3 +39,5 @@ pip install -r requirements.txt
 cd ../
 python server.py
 ```
+## Drag-drop and Crop an image and click the search button:
+
