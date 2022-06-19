@@ -18,12 +18,6 @@ install and re-login (python 3.7)
 conda create -n kristin  python=3.7
 ```
 
-then create the env from .yml file
-
-```
-conda env create -f environment.yml
-```
-
 and activate it
 
 ```
