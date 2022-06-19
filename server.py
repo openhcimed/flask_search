@@ -32,7 +32,7 @@ def get_diameter(diameter):
 
 # Read candidates and metadata
 SKIP = [660, 6679, 6680, 9943, 11078, 11338, 18692, 19957, 22403]   # Skip non-accessible images
-dl_info = pd.read_csv('../data/DL_info.csv') # Metadata of lesions
+dl_info = pd.read_csv('data/DL_info.csv') # Metadata of lesions
 dl_info = dl_info[~dl_info.index.isin(SKIP)]
 dl_info = dl_info[dl_info.Train_Val_Test == 3].reset_index(drop=True)
 dl_info['label'] = dl_info.Coarse_lesion_type - 1
@@ -97,10 +97,34 @@ def prepare_for_render(img):
 
 def search(query_emb, k=8):
     '''Search the closest k neighbors of query image among all candidates'''
-    distance = np.subtract(query_emb, frangi(emb_image, sigmas=1, scale_step=1, beta=6,
-                                             gamma=0.00000002, black_ridges=True))
+
+    ###### WHY RUN FRANGI AGAIN HERE????
+
+
+    # im = Image.fromarray((query_emb*255).astype(np.uint8))
+    # im.save("query.png")
+
+    # frangi_img = frangi(query_emb, sigmas=1, scale_step=1, beta=6,
+    #                                          gamma=0.00000002, black_ridges=True)
+
+    # print('emb_image', emb_image.shape)
+    # print('frangi', frangi_img.shape)
+
+
+    # im = Image.fromarray((frangi_img*255).astype(np.uint8))
+    # im.save("frangi.png")
+
+    #
+    #
+    #### very strange, please double check
+    #
+    #
+    distance = np.subtract(query_emb, emb_image)
     distance = np.linalg.norm(distance, axis=1, ord=2)
     indices = np.argsort(distance)
+
+    print('indices', indices)
+
     candidates = [
         (prepare_for_render(raw_image[i]),
          f'{distance[i]:.2f}',
@@ -123,12 +147,20 @@ def index():
         image_array = base64.b64decode(image_base64)
         image_array = np.frombuffer(image_array, dtype=np.uint8)
         query = get_query_image(image_array, num_row, num_col)
+
+        im = Image.fromarray((query*255).astype(np.uint8))
+        im.save("query1.png")
+
         # query = torch.tensor(query)
         # query = F.interpolate(query.unsqueeze(dim=0).unsqueeze(dim=0), (224, 224)).float().squeeze().squeeze()
         # query = query.numpy()
         tempquery = query
         query = frangi(query, sigmas=1, scale_step=1, beta=6,
                                              gamma=0.00000002, black_ridges=True)
+        im = Image.fromarray((query*255).astype(np.uint8))
+        im.save("frangi1.png")
+
+
         query_emb_simclr = get_image_embedding(query)
 
         # Search
