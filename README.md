@@ -34,7 +34,7 @@ pip install -r requirements.txt
 
 ```
 cd ../
-python server.py
+python server_vae.py
 ```
 ## Drag-drop and Crop an image and click the search button:
 <img width="609" alt="drag-drop image" src="https://user-images.githubusercontent.com/22691548/174459159-dea3bca4-13cb-4ed0-afb4-0f5f87cd66d1.png">
