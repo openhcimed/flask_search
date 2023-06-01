@@ -1,4 +1,5 @@
-# flask_search
+# Front_UI install:
+https://github.com/umb-deephealth/deephealth-annotate
 
 ## weights
 
