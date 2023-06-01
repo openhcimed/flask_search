@@ -11,17 +11,17 @@ curl -L https://www.dropbox.com/sh/nok6uvc892jy71y/AAChDBdm-9u4eJNsGiro0iWEa?dl=
 unzip weights.zip
 ```
 ## conda env
-we need miniconda (https://docs.conda.io/en/latest/miniconda.html)
+You need miniconda (https://docs.conda.io/en/latest/miniconda.html)
 
 install and re-login (python 3.7)
 ```
-conda create -n kristin python=3.7
+conda create -n your_env python=3.7
 ```
 
 and activate it
 
 ```
-conda activate kristin
+conda activate your_env
 ```
 
 and then install the pip packages
